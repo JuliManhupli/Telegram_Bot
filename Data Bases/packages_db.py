@@ -2,6 +2,22 @@
 Database which contains information about packages
 """
 
+import connector
+from connector import db
+
+cursor = db.cursor(buffered=True)
+
+"""
+    Database Recipe. 
+    Tables:
+        package;
+        category;
+        day_users;
+        recipe;
+        ...
+        
+"""
+
 # Table: Packages
 # Fields:
 # id
