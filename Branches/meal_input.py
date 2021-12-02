@@ -2,10 +2,7 @@
 
 
 import telebot
-from telebot import types
 import config
-import products_input
-import timer
 
 bot = telebot.TeleBot(config.TOKEN)
 
