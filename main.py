@@ -1,9 +1,9 @@
 import telebot
 from telebot import types
 import config
-import json
-import products_input
-import meal_input
+from Branches import products_input
+from Branches import meal_input
+from Branches import packages
 
 bot = telebot.TeleBot(config.TOKEN)
 
