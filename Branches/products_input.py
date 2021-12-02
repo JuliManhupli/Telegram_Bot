@@ -1,10 +1,12 @@
 """File with product input branch"""
 
 
-import first_try
+import main
 import json
 import telebot
+import config
 from telebot import types
+bot = telebot.TeleBot(config.TOKEN)
 
 
 # def add_all_ingredients(*ingredients):
