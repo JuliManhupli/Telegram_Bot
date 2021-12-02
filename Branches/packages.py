@@ -1,10 +1,11 @@
 """File for packages that give dishes everyday"""
 
-import first_try
-import json
 import telebot
+import main
+import json
+import config
 from telebot import types
-
+bot = telebot.TeleBot(config.TOKEN)
 
 @bot.message_handler(func=lambda message: True, content_types=['text'])
 def check_package(message):
