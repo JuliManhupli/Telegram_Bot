@@ -1,0 +1,4 @@
+Flask==2.0.2
+mysql==0.0.3
+mysql-connector-python==8.0.27
+pyTelegramBotAPI==4.2.0
