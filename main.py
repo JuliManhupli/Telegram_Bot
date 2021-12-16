@@ -26,7 +26,7 @@ def welcome(message):
     bot.send_message(message.chat.id, "Приветствие", reply_markup=markup)
 
 
-@bot.message_handler(content_types=['text'])
+@bot.message_handler(func=lambda message: True, content_types=['text'])
 def user_choice(message):
     """Choice of branch"""
     if message.chat.type == 'private':
@@ -45,7 +45,7 @@ def user_choice(message):
             bot.register_next_step_handler(d, help)
 
 
-@bot.message_handler(content_types=['text'])
+@bot.message_handler(func=lambda message: True, content_types=['text'])
 def find_meal(message):
     """Finds meal with the same name that user gave"""
     name = message.text
@@ -61,7 +61,7 @@ def find_meal(message):
     """
 
 
-@bot.message_handler(content_types=['text'])
+@bot.message_handler(func=lambda message: True, content_types=['text'])
 def show_meal_info(message, meal_name):
     """Shows full info of meal (name, picture, complexity, category, products, time of cooking, etc.)"""
 
@@ -107,6 +107,12 @@ def show_meal_info(message, meal_name):
 #
 #
 #
+
+
+@bot.message_handler(content_types='text')
+def echo(message: types.Message):
+    bot.send_message(message.from_user.id, message.text)
+
 
 @server.route('/' + TOKEN, methods=['POST'])
 def get_message():
