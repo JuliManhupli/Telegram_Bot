@@ -6,11 +6,15 @@ import config
 
 bot = telebot.TeleBot(config.TOKEN)
 
+meal_name = ""
 
-@bot.message_handler(func=lambda message: True, content_types=['text'])
+
 def find_meal(message):
     """Finds meal with the same name that user gave"""
-
+    name = message.text
+    meal_name = name
+    msg = bot.send_message(message.chat.id, 'Вот ваше блюдо:')
+    bot.register_next_step_handler(msg, show_meal_info)
     """
     while True:
         if name_of_meal in recipe.py:
@@ -20,10 +24,9 @@ def find_meal(message):
     """
 
 
-@bot.message_handler(func=lambda message: True, content_types=['text'])
-def show_meal_info(message):
+def show_meal_info(message, meal_name):
     """Shows full info of meal (name, picture, complexity, category, products, time of cooking, etc.)"""
-
+    bot.send_message(message.chat.id, meal_name)
     """
         open("meals_db.py")
         meal_info = "meals_db.py".get("full_meal_information")

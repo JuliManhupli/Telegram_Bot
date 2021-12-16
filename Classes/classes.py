@@ -1,5 +1,3 @@
-dict = {}
-
 
 class Meal:
     """Additional class for storing info of products"""
@@ -17,3 +15,6 @@ class Package:
         self.lunch_time = lunch_time
         self.breakfast_time = breakfast_time
         self.name = name
+
+
+meal_dict = {}
