@@ -5,9 +5,14 @@ from config import TOKEN, db, APP_URL
 from flask import Flask, request
 
 
-
 bot = telebot.TeleBot(TOKEN)
 server = Flask(__name__)
+
+user_dict = {}
+
+class User:
+    def __init__(self, name):
+        self.name = name
 
 
 @bot.message_handler(commands=['start'])
@@ -29,52 +34,61 @@ def welcome(message):
 @bot.message_handler(func=lambda message: True, content_types=['text'])
 def user_choice(message):
     """Choice of branch"""
-    if message.chat.type == 'private':
-        if message.text == 'Поиск по продуктам👥':
-            a = bot.send_message(message.chat.id, "Введите продукты")
+    if message.text == 'Поиск по продуктам👥':
+        a = bot.send_message(message.chat.id, "Введите продукты")
 
             # bot.register_next_step_handler(a, products_input)
-        elif message.text == 'Поиск по названию👥':
-            b = bot.send_message(message.chat.id, "Введите название блюда, которое ищете!")
-            bot.register_next_step_handler(b, find_meal)
-        elif message.text == 'Пакеты👥':
-            c = bot.send_message(message.chat.id, "3")
-            # bot.register_next_step_handler(c, packages)
-        elif message.text == 'Help👥':
-            d = bot.send_message(message.chat.id, "4")
-            bot.register_next_step_handler(d, help)
+    elif message.text == 'Поиск по названию👥':
+        b = bot.send_message(message.chat.id, "Введите название блюда, которое ищете!")
+        bot.register_next_step_handler(b, find_meal)
+    elif message.text == 'Пакеты👥':
+         c = bot.send_message(message.chat.id, "3")
+        # bot.register_next_step_handler(c, packages)
+    elif message.text == 'Help👥':
+        d = bot.send_message(message.chat.id, "4")
+        bot.register_next_step_handler(d, help)
 
 
 @bot.message_handler(func=lambda message: True, content_types=['text'])
 def find_meal(message):
     """Finds meal with the same name that user gave"""
     name = message.text
-    meal_name = name
-    msg = bot.send_message(message.chat.id, 'Вот ваше блюдо:')
-    bot.register_next_step_handler(msg, show_meal_info(msg, meal_name))
-    """
-    while True:
-        if name_of_meal in recipe.py:
-            bot.register_next_step_handler(message.chat.id, products_input.show_meal_info)
-        else:
-            bot.send_message(message.chat.id, "Блюд с таким именем нет(")
-    """
+    bot.reply_to(message, 'Вот ваше блюдо:')
+
+    cursor = db.cursor()
+    select = "SELECT meaL_name FROM meal " \
+             "WHERE meaL_name LIKE '%"+name+"%'"
+    cursor.execute(select)
+    records = cursor.fetchall()
+    if len(records) == 0:
+        bot.send_message(message.chat.id, "None")
+    else:
+        buttons = []
+        for value in records:
+            buttons.append([types.InlineKeyboardButton(text=value[0], callback_data=value[0])])
+        msg = bot.send_message(message.chat.id, reply_markup=types.InlineKeyboardMarkup(buttons), text="Вот блюда, которые мы нашли:")
 
 
-@bot.message_handler(func=lambda message: True, content_types=['text'])
-def show_meal_info(message, meal_name):
+# @bot.callback_query_handler(func=lambda call: True)
+# def answer_markup_for_name(call):
+#     bot.send_message(call.message.chat.id,
+
+
+def show_recept(message):
     """Shows full info of meal (name, picture, complexity, category, products, time of cooking, etc.)"""
 
-    b = bot.send_message(message.chat.id, "Here is database")
-    cursor = db.cursor()
-    cursor.execute(
-        "SELECT id, Customer_organization_name, Surname, First_name, Patronymic, Customer_phone_number, Customer_mail FROM Customer")
-    records = cursor.fetchall()
+    bot.send_message(message.chat.id, message)
 
-    for i, id in enumerate(records, start=1):
-        bot.send_message(message.chat.id, id)
 
-    a = bot.send_message(message.chat.id, "Here is database")
+    # cursor = db.cursor()
+    # cursor.execute(
+    #     "SELECT id, Customer_organization_name, Surname, First_name, Patronymic, Customer_phone_number, Customer_mail FROM Customer")
+    # records = cursor.fetchall()
+    #
+    # for i, id in enumerate(records, start=1):
+    #     bot.send_message(message.chat.id, id)
+    #
+    # a = bot.send_message(message.chat.id, "Here is database")
     # bot.register_next_step_handler(a, get_recipe)
     """
         open("meals_db.py")
@@ -106,12 +120,11 @@ def show_meal_info(message, meal_name):
 #
 #
 #
-#
+# bot.polling()
 
-
-@bot.message_handler(content_types='text')
-def echo(message: types.Message):
-    bot.send_message(message.from_user.id, message.text)
+# @bot.message_handler(content_types='text')
+# def echo(message: types.Message):
+#     bot.send_message(message.from_user.id, message.text)
 
 
 @server.route('/' + TOKEN, methods=['POST'])
