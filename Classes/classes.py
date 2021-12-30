@@ -1,5 +1,5 @@
 from config import db
-
+import random
 
 class Dish:
     def __init__(self):
@@ -18,22 +18,21 @@ class Dish:
         records = cursor.fetchall()
         return records
 
-
-    def get_name(self):
+    def get_name_by_name(self):
         cursor = db.cursor()
         select = f"SELECT meal_name FROM dish WHERE meal_name LIKE '%{self.name}%'"
         cursor.execute(select)
         records = cursor.fetchall()
         return records
 
-    def get_recipe(self):
+    def get_info_by_id(self):
         cursor = db.cursor()
-        select = f"SELECT recipe_text FROM dish WHERE id = '{self.id}'"
+        select = f"SELECT dish.meal_name, dish.ingredients, dish.recipe_text, sum(recipe.step_time) FROM dish, recipe WHERE dish.id = {self.id} and recipe.meal_id = {self.id}"
         cursor.execute(select)
         records = cursor.fetchall()
         return records
 
-    def get_ingredient(self):
+    def get_name_by_ingredient(self):
         cursor = db.cursor()
         select = f"SELECT meal_name FROM dish WHERE ingredients LIKE '%{self.ingredient}%'"
         cursor.execute(select)
@@ -42,25 +41,48 @@ class Dish:
 
     def category_check_with_ingredient(self):
         cursor = db.cursor()
-        select = f"SELECT meal_name FROM dish WHERE ingredients LIKE '%{self.ingredient}%' and category_id = {self.category}"
+        select = f"SELECT meal_name FROM dish WHERE meal_name = '{self.name}' and category_id = {self.category}"
         cursor.execute(select)
         records = cursor.fetchall()
-        if len(records) <= 0:
+        if len(records) == 0:
             return None
         return records
 
-    def category_check_with_ingredient_and_complexity(self):
+    def complexity_check(self):
         cursor = db.cursor()
-        select = f"SELECT meal_name FROM dish WHERE ingredients LIKE '%{self.ingredient}%' and category_id = {self.category} and complexity = {self.complexity}"
+        select = f"SELECT meal_name FROM dish WHERE meal_name = '{self.name}' and category_id = {self.category} and complexity = {self.complexity}"
         cursor.execute(select)
         records = cursor.fetchall()
-        if len(records) <= 0:
+        if len(records) == 0:
             return None
         return records
 
-    def get_recipe_steps(self):
+    def get_recipe_and_steps_by_id(self):
         cursor = db.cursor()
-        select = f"SELECT recipe_step, step_time FROM recipe WHERE meal_id = (SELECT id from dish WHERE meal_name = '{self.name}')"
+        select = f"SELECT recipe_step, step_time FROM recipe WHERE meal_id = (SELECT id from dish WHERE id = '{self.id}')"
         cursor.execute(select)
         records = cursor.fetchall()
         return records
+
+    @staticmethod
+    def get_random_package(category):
+        cursor = db.cursor()
+        select = f"SELECT id FROM dish WHERE category_id = {category}"
+        cursor.execute(select)
+        records = cursor.fetchall()
+        return random.choice(records)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

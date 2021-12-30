@@ -1,13 +1,10 @@
-import random
-
 import telebot
 import os
 import time
 from Classes.classes import Dish
-from config import TOKEN, db, APP_URL
+from config import TOKEN, APP_URL
 from telebot import types
 from help import *
-from pyrogram.errors import FloodWait
 from flask import Flask, request
 
 bot = telebot.TeleBot(TOKEN)
