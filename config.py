@@ -1,6 +1,6 @@
 import mysql.connector
 
-TOKEN = "2137770043:AAHcNPNXfJiaw9zMLZ0Ly5aO8m3mRsthw28"
+TOKEN = "5043775245:AAHQMUKAfbyvZhS2p3YevxwR5YT-9-d7DP4"
 APP_URL = f'https://first-try-bot.herokuapp.com/{TOKEN}'
 
 db = mysql.connector.connect(
@@ -9,3 +9,4 @@ db = mysql.connector.connect(
     password="74eda92c",
     database="heroku_0172a37b43bafa6"
 )
+
