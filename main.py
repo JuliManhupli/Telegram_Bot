@@ -1,14 +1,13 @@
 import telebot
-import os
 import time
 from Classes.classes import Dish
-from config import TOKEN, APP_URL
+from config import TOKEN
 from telebot import types
 from help import *
-from flask import Flask, request
+from flask import Flask
 
-bot = telebot.TeleBot(TOKEN)
 server = Flask(__name__)
+bot = telebot.TeleBot(TOKEN)
 user_dict = {}
 
 
@@ -536,21 +535,17 @@ def get_random_dish(message, category_id):
                                                f'Полный рецепт: {meal[0][2]}')
 
 
-@server.route('/' + TOKEN, methods=['POST'])
-def get_message():
-    json_string = request.get_data().decode("utf-8")
-    update = types.Update.de_json(json_string)
-    bot.process_new_updates([update])
-    return "Ok", 200
-
-
-@server.route('/')
+@server.route('/', methods=["GET"])
 def webhook():
+    return "ok", 200
+
+
+@server.route('/', methods=['POST'])
+def get_message():
     bot.remove_webhook()
-    bot.set_webhook(url=APP_URL)
-    return "Ok", 200
+    bot.set_webhook(url='https://35.223.199.175:8443', certificate=open('webhook_cert.pem'))
+    return "ok", 200
 
 
-
-if __name__ == '__main__':
-    server.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+if __name__ == "__main__":
+    server.run(host="0.0.0.0", port=8443, ssl_context=('webhook_cert.pem', 'webhook_key.key'))
