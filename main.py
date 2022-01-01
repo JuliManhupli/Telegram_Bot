@@ -9,7 +9,7 @@ from help import *
 from flask import Flask, request
 
 bot = telebot.TeleBot(TOKEN)
-# server = Flask(__name__)
+server = Flask(__name__)
 # logger = telebot.logger
 # logger.setLevel(logging.DEBUG)
 user_dict = {}
@@ -122,7 +122,7 @@ def product_input(message):
     bot.reply_to(message, 'Вот ваш ингредиент:')
 
     search_by_ingredient = Dish()
-    search_by_ingredient.ingredient = message.text
+    search_by_ingredient.ingredient = message.text.lower()
     user_dict['ingredient_object'] = search_by_ingredient
     records = search_by_ingredient.get_name_by_ingredient()
 
@@ -539,22 +539,20 @@ def get_random_dish(message, category_id):
                                                f'Полный рецепт: {meal[0][2]}')
 
 
-bot.polling()
+@server.route('/' + TOKEN, methods=['POST'])
+def get_message():
+    json_string = request.get_data().decode("utf-8")
+    update = types.Update.de_json(json_string)
+    bot.process_new_updates([update])
+    return "Ok", 200
 
-# @server.route('/' + TOKEN, methods=['POST'])
-# def get_message():
-#     json_string = request.get_data().decode("utf-8")
-#     update = types.Update.de_json(json_string)
-#     bot.process_new_updates([update])
-#     return "Ok", 200
-#
-#
-# @server.route('/')
-# def webhook():
-#     bot.remove_webhook()
-#     bot.set_webhook(url=APP_URL)
-#     return "Ok", 200
-#
-#
-# if __name__ == '__main__':
-#     server.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+
+@server.route('/')
+def webhook():
+    bot.remove_webhook()
+    bot.set_webhook(url=APP_URL)
+    return "Ok", 200
+
+
+if __name__ == '__main__':
+    server.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
