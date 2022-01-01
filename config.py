@@ -1,11 +1,12 @@
 import mysql.connector
 
-TOKEN = "2083866513:AAHT-VDh0budXvmH-Dik9savYEV__dYF5n0"
+TOKEN = "5043775245:AAHQMUKAfbyvZhS2p3YevxwR5YT-9-d7DP4"
+APP_URL = f'https://culinary-bot.herokuapp.com/{TOKEN}'
 
 db = mysql.connector.connect(
-    host="akaugustmint.mysql.pythonanywhere-services.com",
-    user="akaugustmint",
-    password="culinary_bot123",
+    host="localhost",
+    user="root",
+    password="Anutka.1257.z",
     database="culinary_bot"
 )
 
