@@ -1,19 +1,18 @@
+import flask
 import telebot
-import os
-import logging
 import time
+import logging
 from Classes.classes import Dish
-from config import TOKEN, APP_URL
+from config import TOKEN
 from telebot import types
-from help import *
-from flask import Flask, request
+from help import help_products, help_name, help_random_dishes, help_complexity, help_category, help_use_bot
+
 
 bot = telebot.TeleBot(TOKEN)
-server = Flask(__name__)
-# logger = telebot.logger
-# logger.setLevel(logging.DEBUG)
+server = flask.Flask(__name__)
+logger = telebot.logger
+logger.setLevel(logging.DEBUG)
 user_dict = {}
-
 
 @bot.message_handler(commands=['start'])
 def welcome(message):
@@ -57,7 +56,7 @@ def user_choice(message):
 
 
 #                   Branch "Help"
-###########################################################
+##########################################################
 
 
 def keyboard_for_help():
@@ -76,9 +75,9 @@ def bot_help(call):
     """Callback handler for user to choose category of branches for help"""
 
     if call.data == 'products':
-        bot.send_message(call.message.chat.id, products)
+        bot.send_message(call.message.chat.id, help_products)
     elif call.data == 'name':
-        bot.send_message(call.message.chat.id, name)
+        bot.send_message(call.message.chat.id, help_name)
     elif call.data == 'questions':
         bot.send_message(call.message.chat.id, text="Вопросы", reply_markup=keyboard_for_questions())
     bot.answer_callback_query(call.id)
@@ -101,13 +100,13 @@ def answer_markup_for_questions(call):
     """Callback handler for user to choose category of question for help"""
 
     if call.data == 'random':
-        bot.send_message(call.message.chat.id, random_dishes)
+        bot.send_message(call.message.chat.id, help_random_dishes)
     elif call.data == 'complexity':
-        bot.send_message(call.message.chat.id, complexity)
+        bot.send_message(call.message.chat.id, help_complexity)
     elif call.data == 'category':
-        bot.send_message(call.message.chat.id, category)
+        bot.send_message(call.message.chat.id, help_category)
     elif call.data == 'use bot':
-        bot.send_message(call.message.chat.id, use_bot)
+        bot.send_message(call.message.chat.id, help_use_bot)
     bot.answer_callback_query(call.id)
 
 
@@ -122,7 +121,7 @@ def product_input(message):
     bot.reply_to(message, 'Вот ваш ингредиент:')
 
     search_by_ingredient = Dish()
-    search_by_ingredient.ingredient = message.text.lower()
+    search_by_ingredient.ingredient = message.text.title()
     user_dict['ingredient_object'] = search_by_ingredient
     records = search_by_ingredient.get_name_by_ingredient()
 
@@ -539,20 +538,22 @@ def get_random_dish(message, category_id):
                                                f'Полный рецепт: {meal[0][2]}')
 
 
-@server.route('/' + TOKEN, methods=['POST'])
-def get_message():
-    json_string = request.get_data().decode("utf-8")
-    update = types.Update.de_json(json_string)
-    bot.process_new_updates([update])
-    return "Ok", 200
-
-
-@server.route('/')
+@server.route('/', methods=["GET"])
 def webhook():
     bot.remove_webhook()
-    bot.set_webhook(url=APP_URL)
-    return "Ok", 200
+    bot.set_webhook(url='https://34.116.185.251:8443', certificate=open('webhook_cert.pem'))
+    return "ok", 200
 
 
-if __name__ == '__main__':
-    server.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+@server.route('/', methods=['POST'])
+def get_message():
+    bot.process_new_updates([types.Update.de_json(flask.request.stream.read().decode("utf-8"))])
+    return "ok", 200
+
+
+if __name__ == "__main__":
+    server.run(host="0.0.0.0", port=8443, ssl_context=('webhook_cert.pem', 'webhook_key.key'))
+
+
+
+
